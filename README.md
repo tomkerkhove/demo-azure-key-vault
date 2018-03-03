@@ -6,6 +6,6 @@ This repo contains several scenarios around Azure Key Vault:
 
 1. **Acquiring & setting secrets** - Basic Azure AD authentication
 2. **Acquiring & setting secrets** - Managed Service Identity authentication
-2. **Acquiring & setting secrets** - Memory caching for performance optimizations
+3. **Acquiring & setting secrets** - Memory caching for performance optimizations
 4. **Secret Management** - Automatic key rolling without application impact
-3. **Encryption** - Encrypting & decrypting text with different key version
+5. **Encryption** - Encrypting & decrypting text with different key version
