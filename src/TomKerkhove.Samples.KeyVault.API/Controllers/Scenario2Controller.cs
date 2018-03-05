@@ -9,7 +9,7 @@ namespace TomKerkhove.Samples.KeyVault.API.Controllers
     [Route("api/v1/secrets/managed-service-identity/", Name = "Secrets (Managed Service Identity)")]
     public class Scenario2Controller : Controller
     {
-        private readonly string vaultUri = "<Configure-Me>";
+        private readonly string vaultUri = "https://secure-applications.vault.azure.net/";
 
         [HttpGet("{secretName}")]
         [SwaggerOperation("Get Secret (Basic Authentication)")]
