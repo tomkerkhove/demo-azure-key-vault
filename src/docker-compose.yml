@@ -1,8 +1,0 @@
-version: '3'
-
-services:
-  tomkerkhove.samples.keyvault.api:
-    image: tomkerkhove.samples.keyvault.api
-    build:
-      context: ./TomKerkhove.Samples.KeyVault.API
-      dockerfile: Dockerfile
