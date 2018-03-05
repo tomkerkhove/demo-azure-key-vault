@@ -8,7 +8,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace TomKerkhove.Samples.KeyVault.API.Controllers
 {
-    [Route("api/v1/secrets/basic-auth/", Name = "Secrets (Basic Authentication)")]
+    [Route("api/v1/secrets/basic-auth/", Name = "Demo 1 - Secrets with Basic Authentication")]
     public class Scenario1Controller : Controller
     {
         // You should never do this, but it's a demo so why bother!
