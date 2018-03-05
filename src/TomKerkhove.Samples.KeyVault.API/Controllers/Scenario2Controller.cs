@@ -12,7 +12,7 @@ namespace TomKerkhove.Samples.KeyVault.API.Controllers
         private readonly string vaultUri = "https://secure-applications.vault.azure.net/";
 
         [HttpGet("{secretName}")]
-        [SwaggerOperation("Get Secret (Basic Authentication)")]
+        [SwaggerOperation("Get Secret (Managed Service Identity)")]
         public async Task<string> Get(string secretName)
         {
             var keyVaultClient = GetKeyVaultClient();
@@ -22,7 +22,7 @@ namespace TomKerkhove.Samples.KeyVault.API.Controllers
         }
 
         [HttpPut("{secretName}")]
-        [SwaggerOperation("Set Secret (Basic Authentication)")]
+        [SwaggerOperation("Set Secret (Managed Service Identity)")]
         public async Task Put(string secretName, [FromBody] string secretValue)
         {
             var keyVaultClient = GetKeyVaultClient();
