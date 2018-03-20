@@ -15,3 +15,5 @@ Demo on how you can use in-memory caching to avoid hitting Azure Key Vault every
     - Will retrieve Service Bus connection string for specific auth policy from Key Vault
     - Secret will be stored in-memory and metrics provide insights in cache hit/miss ratio
 - Azure Automation is automatically rolling the authentication keys every day via PowerShell
+
+![Key Rolling scenario](./media/key-rolling.png)
