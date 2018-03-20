@@ -25,30 +25,32 @@ catch {
     }
 }
 
-function Roll-ServiceBusKey($serviceBusNamespaceName, $serviceBusAccessPolicyName, $resourceGroupName, $vaultName, $secretName)
+function Roll-ServiceBusKey($resourceGroupName, $vaultName, $serviceBusNamespaceName, $serviceBusAccessPolicyName, $secretName)
 {
-    Write-Output "Rolling keys for Service Bus namespace '$serviceBusNamespaceName' for access policy '$serviceBusAccessPolicyName'"
+    Write-Output "Rolling authentication keys for Service Bus namespace '$serviceBusNamespaceName' with access policy '$serviceBusAccessPolicyName'"
 
     # Roll secondary key
-    $policyKeys = New-AzureRmServiceBusNamespaceKey -AuthorizationRuleName $serviceBusAccessPolicyName -NamespaceName $serviceBusNamespaceName -RegenerateKeys SecondaryKey -ResourceGroup $resourceGroupName
+    New-AzureRmServiceBusKey -ResourceGroup $resourceGroupName -Namespace $serviceBusNamespaceName -Name $serviceBusAccessPolicyName -RegenerateKey SecondaryKey
     Write-Output "Secondary key rolled"
-
+    $policyKeys = Get-AzureRmServiceBusKey -Namespace $serviceBusNamespaceName -Name $serviceBusAccessPolicyName -ResourceGroup $resourceGroupName
+    
     # Update secret in Key Vault with new secondary key
     $secretValue = ConvertTo-SecureString $policyKeys.SecondaryConnectionString -AsPlainText -Force
     $secret = Set-AzureKeyVaultSecret -vaultName $vaultName -Name $secretName -secretValue $secretValue
-
+    Write-Output "Changed secret '$secretName' to use secondary key for now (New version '$($secret.Version)')"
+    
     # Roll primary key
-    $policyKeys = New-AzureRmServiceBusNamespaceKey -AuthorizationRuleName $serviceBusAccessPolicyName -NamespaceName $serviceBusNamespaceName -RegenerateKeys PrimaryKey -ResourceGroup $resourceGroupName
+    New-AzureRmServiceBusKey -Namespace $serviceBusNamespaceName -Name $serviceBusAccessPolicyName -RegenerateKey PrimaryKey -ResourceGroup $resourceGroupName
     Write-Output "Primary key rolled"
-
+    $policyKeys = Get-AzureRmServiceBusKey -Namespace $serviceBusNamespaceName -Name $serviceBusAccessPolicyName -ResourceGroup $resourceGroupName
+    
     # Update secret in Key Vault with new primary key
     $secretValue = ConvertTo-SecureString $policyKeys.PrimaryConnectionString -AsPlainText -Force
     $secret = Set-AzureKeyVaultSecret -vaultName $vaultName -Name $secretName -secretValue $secretValue
+    Write-Output "Changed secret '$secretName' to use primary key again (New version '$($secret.Version)')"
 
-    Write-Output "Keys rolled for Service Bus namespace '$serviceBusNamespaceName' for access policy '$serviceBusAccessPolicyName'"
+    Write-Output "Authentication keys rolled for Service Bus namespace '$serviceBusNamespaceName' with access policy '$serviceBusAccessPolicyName'"
 }
 
 # Example of rolling keys
-Roll-ServiceBusKey -serviceBusNamespaceName 'fdc-sandbox' -serviceBusAccessPolicyName 'API'
-                   -vaultName 'secure-applications' -secretName 'Messaging-ConnectionString'
-                   -resourceGroupName 'secure-applications'
+Roll-ServiceBusKey -resourceGroupName 'secure-applications-with-key-vault' -vaultName 'secure-applications' -serviceBusNamespaceName 'secure-applications-with-key-vault' -serviceBusAccessPolicyName 'API' -secretName 'ServiceBus-ConnectionString'
