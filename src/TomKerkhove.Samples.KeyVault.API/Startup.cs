@@ -30,9 +30,13 @@ namespace TomKerkhove.Samples.KeyVault.API
                 app.UseDeveloperExceptionPage();
             }
 
+            IsDevelopment = env.IsDevelopment();
+
             app.UseMvc();
             UseOpenApiUi(app);
         }
+
+        public static bool IsDevelopment { get; private set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -62,7 +66,7 @@ namespace TomKerkhove.Samples.KeyVault.API
                 swaggerGenerationOptions.DescribeAllEnumsAsStrings();
                 swaggerGenerationOptions.TagActionsBy(apiDescription =>
                 {
-                    var routeAttribute = (RouteAttribute) apiDescription.ControllerAttributes().Single(attribute => attribute.GetType() == typeof(RouteAttribute));
+                    var routeAttribute = (RouteAttribute)apiDescription.ControllerAttributes().Single(attribute => attribute.GetType() == typeof(RouteAttribute));
                     return routeAttribute.Name;
                 });
             });

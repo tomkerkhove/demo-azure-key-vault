@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System;
+using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.ServiceBus;
@@ -14,7 +16,7 @@ namespace TomKerkhove.Samples.KeyVault.API.Controllers
     public class SecretsWithCachingController : Controller
     {
         private const string OrdersQueueName = "orders";
-        private const string SecretName = "ServiceBus";
+        private const string SecretName = "ServiceBus-ConnectionString";
         private readonly ICachedSecretProvider secretProvider;
 
         public SecretsWithCachingController(ICachedSecretProvider cachedSecretProvider)
@@ -24,16 +26,25 @@ namespace TomKerkhove.Samples.KeyVault.API.Controllers
 
         [HttpPost]
         [SwaggerOperation("Create Order")]
+        [SwaggerResponse((int)HttpStatusCode.OK, typeof(OrderContract), "Order was succesfully created")]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, typeof(string), "We were unable to process your request")]
         public async Task<IActionResult> CreateOrderAsync([FromBody] OrderContract order)
         {
-            var orderMessage = CreateOrderMessage(order);
+            try
+            {
+                var connectionString = await secretProvider.GetSecretAsync(SecretName);
 
-            var connectionString = await secretProvider.GetSecretAsync(SecretName);
+                var orderMessage = CreateOrderMessage(order);
 
-            var sender = new MessageSender(connectionString, OrdersQueueName);
-            await sender.SendAsync(orderMessage);
+                var sender = new MessageSender(connectionString, OrdersQueueName);
+                await sender.SendAsync(orderMessage);
 
-            return Ok(order);
+                return Ok(order);
+            }
+            catch (Exception)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, "We were unable to process your request");
+            }
         }
 
         private static Message CreateOrderMessage(OrderContract order)

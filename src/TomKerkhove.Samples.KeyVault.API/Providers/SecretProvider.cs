@@ -1,5 +1,7 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Azure.KeyVault;
+using Microsoft.Extensions.Configuration;
 using TomKerkhove.Samples.KeyVault.API.Builders;
 using TomKerkhove.Samples.KeyVault.API.Providers.Interfaces;
 
@@ -11,9 +13,7 @@ namespace TomKerkhove.Samples.KeyVault.API.Providers
 
         public SecretProvider()
         {
-            var isDevelopment = true;
-
-            var keyVaultAutenticationBuilder = isDevelopment ? KeyVaultAutenticationBuilder.UseBasicAuthentication() : KeyVaultAutenticationBuilder.UseManagedServiceIdentity();
+            var keyVaultAutenticationBuilder = Startup.IsDevelopment ? KeyVaultAutenticationBuilder.UseBasicAuthentication() : KeyVaultAutenticationBuilder.UseManagedServiceIdentity();
             keyVaultClient = keyVaultAutenticationBuilder.Build();
         }
 
