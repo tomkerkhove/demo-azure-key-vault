@@ -12,10 +12,12 @@ namespace TomKerkhove.Samples.KeyVault.API.Providers
         private readonly TimeSpan defaultCacheExpiryDuration = TimeSpan.FromDays(value: 4);
         private readonly MemoryCache memoryCache;
         private readonly ISecretProvider secretProvider;
+        private readonly ITelemetryProvider telemetryProvider;
 
-        public MemoryCachedSecretProvider(ISecretProvider secretProvider)
+        public MemoryCachedSecretProvider(ISecretProvider secretProvider, ITelemetryProvider telemetryProvider)
         {
             this.secretProvider = secretProvider;
+            this.telemetryProvider = telemetryProvider;
 
             memoryCache = CreateMemoryCache();
         }
@@ -30,6 +32,8 @@ namespace TomKerkhove.Samples.KeyVault.API.Providers
             // Check if the secret is already cached, return it if it is
             if (ignoreCache == false && memoryCache.TryGetValue(secretName, out string secretValue))
             {
+                telemetryProvider.IncreaseGauge("Cache Hit");
+                telemetryProvider.LogTrace($"Secret '{secretName}' cached");
                 return secretValue;
             }
 
@@ -37,6 +41,8 @@ namespace TomKerkhove.Samples.KeyVault.API.Providers
             var secret = await secretProvider.GetSecretAsync(secretName);
 
             // Store found secret in memory cache
+            telemetryProvider.IncreaseGauge("Cache Miss");
+            telemetryProvider.LogTrace($"Secret '{secretName}' was not cached");
             memoryCache.Set(secretName, secret, defaultCacheExpiryDuration);
 
             return secret;
