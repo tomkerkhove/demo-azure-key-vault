@@ -6,17 +6,22 @@ namespace TomKerkhove.Samples.KeyVault.API.Providers
 {
     public class SecretProvider : ISecretProvider
     {
-        // You should never do this, but it's a demo so why bother!
-        private readonly string vaultUri = "https://secure-applications.vault.azure.net/";
+        private readonly KeyVaultClient keyVaultClient;
 
-        public async Task<string> GetSecretAsync(string secretName)
+        public SecretProvider()
         {
             var isDevelopment = true;
 
             var keyVaultAutenticationBuilder = isDevelopment ? KeyVaultAutenticationBuilder.UseBasicAuthentication() : KeyVaultAutenticationBuilder.UseManagedServiceIdentity();
+            keyVaultClient = keyVaultAutenticationBuilder.Build();
+        }
 
-            var keyVaultClient = keyVaultAutenticationBuilder.Build();
-            var secret = await keyVaultClient.GetSecretAsync(vaultUri, secretName);
+        // You should never do this, but it's a demo so why bother!
+        public string VaultUri { get; } = "https://secure-applications.vault.azure.net/";
+
+        public async Task<string> GetSecretAsync(string secretName)
+        {
+            var secret = await keyVaultClient.GetSecretAsync(VaultUri, secretName);
 
             return secret.Value;
         }
