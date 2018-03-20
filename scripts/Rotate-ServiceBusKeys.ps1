@@ -49,6 +49,6 @@ function Roll-ServiceBusKey($serviceBusNamespaceName, $serviceBusAccessPolicyNam
 }
 
 # Example of rolling keys
-Roll-ServiceBusKey -serviceBusNamespaceName 'fdc-sandbox' -serviceBusAccessPolicyName 'API'
+Roll-ServiceBusKey -serviceBusNamespaceName 'secure-applications' -serviceBusAccessPolicyName 'API'
                    -vaultName 'secure-applications' -secretName 'Messaging-ConnectionString'
                    -resourceGroupName 'secure-applications'
