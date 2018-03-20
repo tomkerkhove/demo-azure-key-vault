@@ -25,9 +25,9 @@ catch {
     }
 }
 
-function Roll-ServiceBusKey($serviceBusNamespaceName, $serviceBusAccessPolicyName, $resourceGroupName, $vaultName, $secretName)
+function Roll-ServiceBusKey($resourceGroupName, $vaultName, $serviceBusNamespaceName, $serviceBusAccessPolicyName, $secretName)
 {
-    Write-Output "Rolling keys for Service Bus namespace '$serviceBusNamespaceName' for access policy '$serviceBusAccessPolicyName'"
+    Write-Output "Rolling authentication keys for Service Bus namespace '$serviceBusNamespaceName' with access policy '$serviceBusAccessPolicyName'"
 
     # Roll secondary key
     $policyKeys = New-AzureRmServiceBusNamespaceKey -AuthorizationRuleName $serviceBusAccessPolicyName -NamespaceName $serviceBusNamespaceName -RegenerateKeys SecondaryKey -ResourceGroup $resourceGroupName
@@ -45,10 +45,10 @@ function Roll-ServiceBusKey($serviceBusNamespaceName, $serviceBusAccessPolicyNam
     $secretValue = ConvertTo-SecureString $policyKeys.PrimaryConnectionString -AsPlainText -Force
     $secret = Set-AzureKeyVaultSecret -vaultName $vaultName -Name $secretName -secretValue $secretValue
 
-    Write-Output "Keys rolled for Service Bus namespace '$serviceBusNamespaceName' for access policy '$serviceBusAccessPolicyName'"
+    Write-Output "Authentication keys rolled for Service Bus namespace '$serviceBusNamespaceName' with access policy '$serviceBusAccessPolicyName'"
 }
 
 # Example of rolling keys
-Roll-ServiceBusKey -serviceBusNamespaceName 'secure-applications' -serviceBusAccessPolicyName 'API'
-                   -vaultName 'secure-applications' -secretName 'Messaging-ConnectionString'
-                   -resourceGroupName 'secure-applications'
+Roll-ServiceBusKey -resourceGroupName 'secure-applications' -vaultName 'secure-applications'
+                    -serviceBusNamespaceName 'secure-applications' -serviceBusAccessPolicyName 'API'
+                    -secretName 'Messaging-ConnectionString'                   
