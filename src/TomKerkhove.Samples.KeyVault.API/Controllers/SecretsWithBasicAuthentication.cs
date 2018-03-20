@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.KeyVault.Models;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using TomKerkhove.Samples.KeyVault.API.Providers.Interfaces;
 
 namespace TomKerkhove.Samples.KeyVault.API.Controllers
 {
@@ -13,24 +16,67 @@ namespace TomKerkhove.Samples.KeyVault.API.Controllers
         // You should never do this, but it's a demo so why bother!
         private readonly string adApplicationId = "666ef5f5-017d-4f01-b105-54fea4d9618f";
         private readonly string adApplicationSecret = "oKQTcEHlIZ7WKAiXqKt0DSC+i1HMOOueQnoHtXORpPs=";
+
+        private readonly ITelemetryProvider telemetryProvider;
         private readonly string vaultUri = "https://secure-applications.vault.azure.net/";
+
+        public SecretsWithBasicAuthentication(ITelemetryProvider telemetryProvider)
+        {
+            this.telemetryProvider = telemetryProvider;
+        }
 
         [HttpGet("{secretName}")]
         [SwaggerOperation("Get Secret (Basic Authentication)")]
-        public async Task<string> Get(string secretName)
+        public async Task<IActionResult> Get(string secretName)
         {
-            var keyVaultClient = GetKeyVaultClient();
-            var secret = await keyVaultClient.GetSecretAsync(vaultUri, secretName);
+            try
+            {
+                var keyVaultClient = GetKeyVaultClient();
+                var secret = await keyVaultClient.GetSecretAsync(vaultUri, secretName);
 
-            return secret.Value;
+                return Ok(secret.Value);
+            }
+            catch (KeyVaultErrorException keyVaultException)
+            {
+                if (keyVaultException.Message.Contains("Secret not found:"))
+                {
+                    return NotFound("Secret not found");
+                }
+
+                throw;
+            }
+            catch (Exception exception)
+            {
+                telemetryProvider.LogException(exception);
+                return StatusCode((int) HttpStatusCode.InternalServerError, "We were unable to process your request");
+            }
         }
 
         [HttpPut("{secretName}")]
         [SwaggerOperation("Set Secret (Basic Authentication)")]
-        public async Task Put(string secretName, [FromBody] string secretValue)
+        public async Task<IActionResult> Put(string secretName, [FromBody] string secretValue)
         {
-            var keyVaultClient = GetKeyVaultClient();
-            await keyVaultClient.SetSecretAsync(vaultUri, secretName, secretValue);
+            try
+            {
+                var keyVaultClient = GetKeyVaultClient();
+                await keyVaultClient.SetSecretAsync(vaultUri, secretName, secretValue);
+
+                return NoContent();
+            }
+            catch (KeyVaultErrorException keyVaultException)
+            {
+                if (keyVaultException.Message.Contains("Secret not found:"))
+                {
+                    return NotFound("Secret not found");
+                }
+
+                throw;
+            }
+            catch (Exception exception)
+            {
+                telemetryProvider.LogException(exception);
+                return StatusCode((int) HttpStatusCode.InternalServerError, "We were unable to process your request");
+            }
         }
 
         private async Task<string> AuthenticationCallback(string authority, string resource, string scope)

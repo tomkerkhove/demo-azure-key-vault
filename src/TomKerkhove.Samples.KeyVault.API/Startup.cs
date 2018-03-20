@@ -20,7 +20,9 @@ namespace TomKerkhove.Samples.KeyVault.API
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        public static IConfiguration Configuration { get; private set; }
+
+        public static bool IsDevelopment { get; private set; }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -36,12 +38,11 @@ namespace TomKerkhove.Samples.KeyVault.API
             UseOpenApiUi(app);
         }
 
-        public static bool IsDevelopment { get; private set; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddSingleton<ITelemetryProvider, ApplicationInsightsTelemetryProvider>();
             services.AddSingleton<ISecretProvider, SecretProvider>();
             services.AddSingleton<ICachedSecretProvider, MemoryCachedSecretProvider>();
             ConfigureOpenApiSpecificationGeneration(services);
@@ -66,7 +67,7 @@ namespace TomKerkhove.Samples.KeyVault.API
                 swaggerGenerationOptions.DescribeAllEnumsAsStrings();
                 swaggerGenerationOptions.TagActionsBy(apiDescription =>
                 {
-                    var routeAttribute = (RouteAttribute)apiDescription.ControllerAttributes().Single(attribute => attribute.GetType() == typeof(RouteAttribute));
+                    var routeAttribute = (RouteAttribute) apiDescription.ControllerAttributes().Single(attribute => attribute.GetType() == typeof(RouteAttribute));
                     return routeAttribute.Name;
                 });
             });

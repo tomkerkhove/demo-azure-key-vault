@@ -3,6 +3,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.KeyVault.Models;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
 using Newtonsoft.Json;
@@ -19,10 +20,12 @@ namespace TomKerkhove.Samples.KeyVault.API.Controllers
         private const string OrdersQueueName = "orders";
         private const string SecretName = "ServiceBus-ConnectionString";
         private readonly ICachedSecretProvider secretProvider;
+        private readonly ITelemetryProvider telemetryProvider;
 
-        public SecretsWithCachingController(ICachedSecretProvider cachedSecretProvider)
+        public SecretsWithCachingController(ICachedSecretProvider secretProvider, ITelemetryProvider telemetryProvider)
         {
-            secretProvider = cachedSecretProvider;
+            this.secretProvider = secretProvider;
+            this.telemetryProvider = telemetryProvider;
         }
 
         [HttpPost]
@@ -39,8 +42,18 @@ namespace TomKerkhove.Samples.KeyVault.API.Controllers
 
                 return Ok(order);
             }
-            catch (Exception)
+            catch (KeyVaultErrorException keyVaultException)
             {
+                if (keyVaultException.Message.Contains("Secret not found:"))
+                {
+                    return NotFound("Secret not found");
+                }
+
+                throw;
+            }
+            catch (Exception exception)
+            {
+                telemetryProvider.LogException(exception);
                 return StatusCode((int) HttpStatusCode.InternalServerError, "We were unable to process your request");
             }
         }
