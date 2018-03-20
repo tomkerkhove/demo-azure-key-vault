@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
 using Newtonsoft.Json;
+using Polly;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using TomKerkhove.Samples.KeyVault.API.Contracts;
 using TomKerkhove.Samples.KeyVault.API.Providers.Interfaces;
@@ -26,32 +27,46 @@ namespace TomKerkhove.Samples.KeyVault.API.Controllers
 
         [HttpPost]
         [SwaggerOperation("Create Order")]
-        [SwaggerResponse((int)HttpStatusCode.OK, typeof(OrderContract), "Order was succesfully created")]
-        [SwaggerResponse((int)HttpStatusCode.InternalServerError, typeof(string), "We were unable to process your request")]
+        [SwaggerResponse((int) HttpStatusCode.OK, typeof(OrderContract), "Order was succesfully created")]
+        [SwaggerResponse((int) HttpStatusCode.InternalServerError, typeof(string), "We were unable to process your request")]
         public async Task<IActionResult> CreateOrderAsync([FromBody] OrderContract order)
         {
             try
             {
-                var connectionString = await secretProvider.GetSecretAsync(SecretName);
+                var rawOrder = CreateOrderMessage(order);
 
-                var orderMessage = CreateOrderMessage(order);
-
-                var sender = new MessageSender(connectionString, OrdersQueueName);
-                await sender.SendAsync(orderMessage);
+                await ProcessNewOrderAsync(rawOrder);
 
                 return Ok(order);
             }
             catch (Exception)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError, "We were unable to process your request");
+                return StatusCode((int) HttpStatusCode.InternalServerError, "We were unable to process your request");
             }
         }
 
-        private static Message CreateOrderMessage(OrderContract order)
+        private static byte[] CreateOrderMessage(OrderContract order)
         {
             var rawOrderInJson = JsonConvert.SerializeObject(order);
             var rawOrderInBytes = Encoding.UTF8.GetBytes(rawOrderInJson);
-            return new Message(rawOrderInBytes);
+            return rawOrderInBytes;
+        }
+
+        private static async Task QueueMessageAsync(byte[] rawOrder, string connectionString)
+        {
+            var orderMessage = new Message(rawOrder);
+            var sender = new MessageSender(connectionString, OrdersQueueName);
+            await sender.SendAsync(orderMessage);
+        }
+
+        private async Task ProcessNewOrderAsync(byte[] rawOrder)
+        {
+            var connectionString = await secretProvider.GetSecretAsync(SecretName);
+
+            var retryPolicy = Policy.Handle<UnauthorizedAccessException>()
+                .RetryAsync(retryCount: 5, onRetryAsync: async (exception, retryCount, context) => connectionString = await secretProvider.GetSecretAsync(SecretName, ignoreCache: true));
+
+            await retryPolicy.ExecuteAsync(async () => await QueueMessageAsync(rawOrder, connectionString));
         }
     }
 }
