@@ -7,6 +7,9 @@ namespace TomKerkhove.Samples.KeyVault.API.Providers
 {
     public class MemoryCachedSecretProvider : ICachedSecretProvider
     {
+        // You should find a balance between caching it, but not too long to limit the risk of exposing it via memory dumps
+        // We cache it very long for demo sake
+        private readonly TimeSpan defaultCacheExpiryDuration = TimeSpan.FromDays(value: 4);
         private readonly MemoryCache memoryCache;
         private readonly ISecretProvider secretProvider;
 
@@ -34,7 +37,7 @@ namespace TomKerkhove.Samples.KeyVault.API.Providers
             var secret = await secretProvider.GetSecretAsync(secretName);
 
             // Store found secret in memory cache
-            memoryCache.Set(secretName, secret, TimeSpan.FromHours(value: 1));
+            memoryCache.Set(secretName, secret, defaultCacheExpiryDuration);
 
             return secret;
         }
