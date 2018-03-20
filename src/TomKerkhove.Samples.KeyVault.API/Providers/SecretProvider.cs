@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Azure.KeyVault;
 using TomKerkhove.Samples.KeyVault.API.Builders;
+using TomKerkhove.Samples.KeyVault.API.Providers.Interfaces;
 
 namespace TomKerkhove.Samples.KeyVault.API.Providers
 {
@@ -21,6 +22,7 @@ namespace TomKerkhove.Samples.KeyVault.API.Providers
 
         public async Task<string> GetSecretAsync(string secretName)
         {
+            // Fetch latest secret from Key Vault
             var secret = await keyVaultClient.GetSecretAsync(VaultUri, secretName);
 
             return secret.Value;

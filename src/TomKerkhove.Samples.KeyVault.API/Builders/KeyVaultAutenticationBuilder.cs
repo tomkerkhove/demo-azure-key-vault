@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Microsoft.Rest;
 
 namespace TomKerkhove.Samples.KeyVault.API.Builders
 {
@@ -19,11 +18,17 @@ namespace TomKerkhove.Samples.KeyVault.API.Builders
             this.authenticationCallback = authenticationCallback;
         }
 
+        /// <summary>
+        ///     Use basic authentication to authenticate with Azure AD
+        /// </summary>
         public static KeyVaultAutenticationBuilder UseBasicAuthentication()
         {
             return new KeyVaultAutenticationBuilder(BasicAuthenticationCallback);
         }
 
+        /// <summary>
+        ///     Use Managed Service Identity to delegate authentication with Azure AD to Azure
+        /// </summary>
         public static KeyVaultAutenticationBuilder UseManagedServiceIdentity()
         {
             var azureServiceTokenProvider = new AzureServiceTokenProvider();
@@ -31,13 +36,16 @@ namespace TomKerkhove.Samples.KeyVault.API.Builders
             return new KeyVaultAutenticationBuilder(authenticationCallback);
         }
 
+        /// <summary>
+        ///     Build the Key Vault client
+        /// </summary>
         public KeyVaultClient Build()
         {
             if (authenticationCallback == null)
             {
                 throw new Exception("No authentication was configured to use");
             }
-            
+
             return new KeyVaultClient(authenticationCallback);
         }
 

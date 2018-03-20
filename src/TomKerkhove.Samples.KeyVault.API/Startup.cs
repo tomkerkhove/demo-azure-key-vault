@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using TomKerkhove.Samples.KeyVault.API.Providers;
+using TomKerkhove.Samples.KeyVault.API.Providers.Interfaces;
 
 namespace TomKerkhove.Samples.KeyVault.API
 {
@@ -37,7 +38,8 @@ namespace TomKerkhove.Samples.KeyVault.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddSingleton<ISecretProvider>(new SecretProvider());
+            services.AddSingleton<ISecretProvider, SecretProvider>();
+            services.AddSingleton<ICachedSecretProvider, MemoryCachedSecretProvider>();
             ConfigureOpenApiSpecificationGeneration(services);
         }
 

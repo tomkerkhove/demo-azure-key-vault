@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace TomKerkhove.Samples.KeyVault.API.Providers
+namespace TomKerkhove.Samples.KeyVault.API.Providers.Interfaces
 {
     public interface ISecretProvider
     {

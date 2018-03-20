@@ -6,7 +6,7 @@ using Microsoft.Azure.ServiceBus.Core;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using TomKerkhove.Samples.KeyVault.API.Contracts;
-using TomKerkhove.Samples.KeyVault.API.Providers;
+using TomKerkhove.Samples.KeyVault.API.Providers.Interfaces;
 
 namespace TomKerkhove.Samples.KeyVault.API.Controllers
 {
@@ -15,11 +15,11 @@ namespace TomKerkhove.Samples.KeyVault.API.Controllers
     {
         private const string OrdersQueueName = "orders";
         private const string SecretName = "ServiceBus";
-        private readonly ISecretProvider secretProvider;
+        private readonly ICachedSecretProvider secretProvider;
 
-        public SecretsWithCachingController(ISecretProvider secretProvider)
+        public SecretsWithCachingController(ICachedSecretProvider cachedSecretProvider)
         {
-            this.secretProvider = secretProvider;
+            secretProvider = cachedSecretProvider;
         }
 
         [HttpPost]
