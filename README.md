@@ -1,9 +1,6 @@
 # Sample - Azure Key Vault
 [![Build Status](https://travis-ci.org/tomkerkhove/sample-azure-key-vault.svg?branch=master)](https://travis-ci.org/tomkerkhove/sample-azure-key-vault)
 
-## Overview
-This repo contains several scenarios around Azure Key Vault:
-
 ## Scenario Overview
 
 ### 1. Authentication
