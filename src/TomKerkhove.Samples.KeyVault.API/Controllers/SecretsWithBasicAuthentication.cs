@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.KeyVault;
@@ -8,14 +7,14 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace TomKerkhove.Samples.KeyVault.API.Controllers
 {
-    [Route("api/v1/secrets/basic-auth/", Name = "Demo 1 - Secrets with Basic Authentication")]
-    public class Scenario1Controller : Controller
+    [Route("api/v1/secrets/basic-auth/", Name = "Scenario 1 - Secrets with Basic Authentication")]
+    public class SecretsWithBasicAuthentication : Controller
     {
         // You should never do this, but it's a demo so why bother!
         private readonly string adApplicationId = "666ef5f5-017d-4f01-b105-54fea4d9618f";
         private readonly string adApplicationSecret = "oKQTcEHlIZ7WKAiXqKt0DSC+i1HMOOueQnoHtXORpPs=";
         private readonly string vaultUri = "https://secure-applications.vault.azure.net/";
-        
+
         [HttpGet("{secretName}")]
         [SwaggerOperation("Get Secret (Basic Authentication)")]
         public async Task<string> Get(string secretName)

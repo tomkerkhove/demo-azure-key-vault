@@ -6,8 +6,8 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace TomKerkhove.Samples.KeyVault.API.Controllers
 {
-    [Route("api/v1/secrets/managed-service-identity/", Name = "Demo 2 - Secrets with Managed Service Identity")]
-    public class Scenario2Controller : Controller
+    [Route("api/v1/secrets/managed-service-identity/", Name = "Scenario 2 - Secrets with Managed Service Identity")]
+    public class SecretsWithManagedServiceIdentityController : Controller
     {
         private readonly string vaultUri = "https://secure-applications.vault.azure.net/";
 
