@@ -1,5 +1,5 @@
 # Sample - Azure Key Vault
-[![Build Status](https://travis-ci.org/tomkerkhove/sample-azure-key-vault.svg?branch=master)](https://travis-ci.org/tomkerkhove/sample-azure-key-vault)
+[![Build Status](https://travis-ci.org/tomkerkhove/demo-azure-key-vault.svg?branch=master)](https://travis-ci.org/tomkerkhove/sample-azure-key-vault)
 
 ## Scenario Overview
 
