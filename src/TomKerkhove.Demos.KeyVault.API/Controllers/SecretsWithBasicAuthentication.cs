@@ -6,16 +6,17 @@ using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.KeyVault.Models;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using TomKerkhove.Samples.KeyVault.API.Providers.Interfaces;
+using TomKerkhove.Demos.KeyVault.API.Providers.Interfaces;
 
-namespace TomKerkhove.Samples.KeyVault.API.Controllers
+namespace TomKerkhove.Demos.KeyVault.API.Controllers
 {
     [Route("api/v1/secrets/basic-auth/", Name = "Scenario 1 - Secrets with Basic Authentication")]
     public class SecretsWithBasicAuthentication : Controller
     {
         // You should never do this, but it's a demo so why bother!
-        private readonly string adApplicationId = "666ef5f5-017d-4f01-b105-54fea4d9618f";
-        private readonly string adApplicationSecret = "oKQTcEHlIZ7WKAiXqKt0DSC+i1HMOOueQnoHtXORpPs=";
+        private readonly string adApplicationId = "<application-id>";
+
+        private readonly string adApplicationSecret = "<application-secret>";
 
         private readonly ITelemetryProvider telemetryProvider;
         private readonly string vaultUri = "https://secure-applications.vault.azure.net/";
@@ -83,7 +84,7 @@ namespace TomKerkhove.Samples.KeyVault.API.Controllers
         {
             var authContext = new AuthenticationContext(authority);
             var clientCredential = new ClientCredential(adApplicationId, adApplicationSecret);
-            var token = await authContext.AcquireTokenAsync(resource, clientCredential).ConfigureAwait(continueOnCapturedContext: false);
+            var token = await authContext.AcquireTokenAsync(resource, clientCredential).ConfigureAwait(false);
 
             if (token == null)
             {
