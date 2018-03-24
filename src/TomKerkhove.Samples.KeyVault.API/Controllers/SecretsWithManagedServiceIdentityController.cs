@@ -6,9 +6,9 @@ using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.KeyVault.Models;
 using Microsoft.Azure.Services.AppAuthentication;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using TomKerkhove.Demos.KeyVault.API.Providers.Interfaces;
+using TomKerkhove.Samples.KeyVault.API.Providers.Interfaces;
 
-namespace TomKerkhove.Demos.KeyVault.API.Controllers
+namespace TomKerkhove.Samples.KeyVault.API.Controllers
 {
     [Route("api/v1/secrets/managed-service-identity/", Name = "Scenario 2 - Secrets with Managed Service Identity")]
     public class SecretsWithManagedServiceIdentityController : Controller
@@ -78,9 +78,7 @@ namespace TomKerkhove.Demos.KeyVault.API.Controllers
         private static KeyVaultClient GetKeyVaultClient()
         {
             var azureServiceTokenProvider = new AzureServiceTokenProvider();
-            var keyVaultClient =
-                new KeyVaultClient(
-                    new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+            var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
             return keyVaultClient;
         }
     }

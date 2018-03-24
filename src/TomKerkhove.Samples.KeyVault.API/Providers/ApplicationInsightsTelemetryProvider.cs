@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
-using TomKerkhove.Demos.KeyVault.API.Providers.Interfaces;
+using TomKerkhove.Samples.KeyVault.API.Providers.Interfaces;
 
-namespace TomKerkhove.Demos.KeyVault.API.Providers
+namespace TomKerkhove.Samples.KeyVault.API.Providers
 {
     public class ApplicationInsightsTelemetryProvider : ITelemetryProvider
     {
@@ -19,7 +19,7 @@ namespace TomKerkhove.Demos.KeyVault.API.Providers
 
         public void IncreaseGauge(string gaugeName)
         {
-            telemetryClient.TrackMetric(gaugeName, 1);
+            telemetryClient.TrackMetric(gaugeName, value: 1);
         }
 
         public void LogException(Exception exception)

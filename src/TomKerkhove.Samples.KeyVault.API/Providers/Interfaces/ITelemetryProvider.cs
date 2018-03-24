@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TomKerkhove.Demos.KeyVault.API.Providers.Interfaces
+namespace TomKerkhove.Samples.KeyVault.API.Providers.Interfaces
 {
     public interface ITelemetryProvider
     {

@@ -6,14 +6,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using TomKerkhove.Demos.KeyVault.API.Providers;
-using TomKerkhove.Demos.KeyVault.API.Providers.Interfaces;
+using TomKerkhove.Samples.KeyVault.API.Providers;
+using TomKerkhove.Samples.KeyVault.API.Providers.Interfaces;
 
-namespace TomKerkhove.Demos.KeyVault.API
+namespace TomKerkhove.Samples.KeyVault.API
 {
     public class Startup
     {
-        private const string OpenApiTitle = "Azure Key Vault Demos";
+        private const string OpenApiTitle = "Azure Key Vault Samples";
 
         public Startup(IConfiguration configuration)
         {
@@ -43,6 +43,8 @@ namespace TomKerkhove.Demos.KeyVault.API
         {
             services.AddMvc();
             services.AddSingleton<ITelemetryProvider, ApplicationInsightsTelemetryProvider>();
+            services.AddSingleton<ISecretProvider, SecretProvider>();
+            services.AddSingleton<ICachedSecretProvider, MemoryCachedSecretProvider>();
             ConfigureOpenApiSpecificationGeneration(services);
         }
 
@@ -65,8 +67,7 @@ namespace TomKerkhove.Demos.KeyVault.API
                 swaggerGenerationOptions.DescribeAllEnumsAsStrings();
                 swaggerGenerationOptions.TagActionsBy(apiDescription =>
                 {
-                    var routeAttribute = (RouteAttribute) apiDescription.ControllerAttributes()
-                        .Single(attribute => attribute.GetType() == typeof(RouteAttribute));
+                    var routeAttribute = (RouteAttribute) apiDescription.ControllerAttributes().Single(attribute => attribute.GetType() == typeof(RouteAttribute));
                     return routeAttribute.Name;
                 });
             });

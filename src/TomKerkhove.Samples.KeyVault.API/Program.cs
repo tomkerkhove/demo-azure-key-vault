@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace TomKerkhove.Demos.KeyVault.API
+namespace TomKerkhove.Samples.KeyVault.API
 {
     public class Program
     {
